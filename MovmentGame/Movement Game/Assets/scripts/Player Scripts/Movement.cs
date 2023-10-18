@@ -14,6 +14,8 @@ public class Movement : MonoBehaviour
     [SerializeField] LayerMask wall;
     [SerializeField] int maxExtraJumps = 1;
     [SerializeField] float wallSpeed = 1500f;
+    [SerializeField] float sprintSpeed = 1000f;
+    bool wallRunning = false;
     bool sprinting = false;
     bool sprintKeyDown = false;
     int jumps;
@@ -37,50 +39,66 @@ public class Movement : MonoBehaviour
         {
             jumps = maxExtraJumps;
         }
-
-       
+        //---------------------------------------------------------------------------
         if (Input.GetButtonDown("Jump") &&  jumps > 0)
         {
             Jump();
             jumps--;
         }
-        if (Input.GetKeyDown(KeyCode.LeftShift) && !touchingWall())
+        //---------------------------------------------------------------------------
+        if (Input.GetKeyDown(KeyCode.LeftShift))
         {
             sprintKeyDown = true;
         }
-        if (Input.GetKeyUp(KeyCode.LeftShift) && !touchingWall())
+        //---------------------------------------------------------------------------
+        if (Input.GetKeyUp(KeyCode.LeftShift))
         { 
             sprintKeyDown = false;
         }
+        //---------------------------------------------------------------------------
         if (sprintKeyDown && !sprinting && !touchingWall()) 
         {
-            movementSpeed *= 2f;
+            movementSpeed = sprintSpeed;
             sprinting = true;
         }
-
+        //---------------------------------------------------------------------------
         if (sprinting && !sprintKeyDown && !touchingWall())
         {
-            movementSpeed *= 0.5f;
+            movementSpeed = baseMovementSpeed;
             sprinting = false;
         }
-
-        if (touchingWall())
-        {
-            if(sprinting)
-            {
-                movementSpeed *= 0.5f;
-                sprinting = false;
-            }
-            rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
-            jumps = maxExtraJumps;
-            movementSpeed = wallSpeed;
+        //---------------------------------------------------------------------------
+        if (sprinting && sprintKeyDown && !touchingWall()){
+            movementSpeed = sprintSpeed;
+            sprinting = true;
         }
+        //---------------------------------------------------------------------------
         if (!touchingWall() && !sprinting)
         {
             movementSpeed = baseMovementSpeed;
         }
+        //---------------------------------------------------------------------------
+        if (touchingWall())
+        {
+            if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.S))
+            {
+                wallRunning = true;
+            }
+            else
+            {
+                wallRunning = false;
+            }
+            
+            movementSpeed = wallSpeed;
+            if (wallRunning)
+            {
+                rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
+            }
+            jumps = maxExtraJumps;
+            
+        }
+        //---------------------------------------------------------------------------
         //Debug.Log(sprinting);
-
         MPRC();
     }
 
@@ -130,5 +148,4 @@ public class Movement : MonoBehaviour
 
         
     }
-    
 }
