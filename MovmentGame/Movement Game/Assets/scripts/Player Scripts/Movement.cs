@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class Movement : MonoBehaviour
 {
@@ -15,6 +16,9 @@ public class Movement : MonoBehaviour
     [SerializeField] int maxExtraJumps = 1;
     [SerializeField] float wallSpeed = 1500f;
     [SerializeField] float sprintSpeed = 1000f;
+    Quaternion wallAngle;
+    
+
     bool wallRunning = false;
     bool sprinting = false;
     bool sprintKeyDown = false;
@@ -44,6 +48,12 @@ public class Movement : MonoBehaviour
         {
             Jump();
             jumps--;
+        }
+        //---------------------------------------------------------------------------
+        if(touchingWall() && Input.GetButtonDown("Jump"))
+        {
+
+            
         }
         //---------------------------------------------------------------------------
         if (Input.GetKeyDown(KeyCode.LeftShift))
@@ -80,6 +90,7 @@ public class Movement : MonoBehaviour
         //---------------------------------------------------------------------------
         if (touchingWall())
         {
+            
             if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.S))
             {
                 wallRunning = true;
@@ -98,8 +109,9 @@ public class Movement : MonoBehaviour
             
         }
         //---------------------------------------------------------------------------
-        //Debug.Log(sprinting);
+       
         MPRC();
+        Debug.Log(Mathf.Asin(wallAngle.y)*2f*(180/Mathf.PI));
     }
 
     bool touchingWall()
@@ -146,6 +158,15 @@ public class Movement : MonoBehaviour
             Jump();
         }
 
+        if(collision.gameObject.CompareTag("Wall")){
+            wallAngle = collision.transform.rotation;
+        }
+
         
+    }
+
+    void OnCollisionExit(Collision collision)
+    {
+
     }
 }
