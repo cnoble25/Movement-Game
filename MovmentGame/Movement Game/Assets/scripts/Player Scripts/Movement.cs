@@ -88,30 +88,26 @@ public class Movement : MonoBehaviour
             movementSpeed = baseMovementSpeed;
         }
         //---------------------------------------------------------------------------
+         MPRC();
+
         if (touchingWall())
         {
-            
-            if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.S))
-            {
-                wallRunning = true;
-            }
-            else
-            {
-                wallRunning = false;
-            }
+            float wallAngleX = Mathf.Cos(Mathf.Asin(wallAngle.y)*2f);
+            float wallAngleZ = Mathf.Sin(Mathf.Asin(wallAngle.y)*2f);
             
             movementSpeed = wallSpeed;
-            if (wallRunning)
-            {
-                rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
+            rb.velocity = new Vector3(wallAngleZ*movementSpeed/120, 0, wallAngleX*movementSpeed/120);
+            if(Input.GetKey("space")){
+                rb.velocity = new Vector3(rb.velocity.z, jumpForce, rb.velocity.x);
             }
             jumps = maxExtraJumps;
+            Debug.Log(wallAngleX);
             
         }
         //---------------------------------------------------------------------------
        
-        MPRC();
-        Debug.Log(Mathf.Asin(wallAngle.y)*2f*(180/Mathf.PI));
+       
+        
     }
 
     bool touchingWall()
