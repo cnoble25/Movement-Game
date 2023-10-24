@@ -94,11 +94,11 @@ public class Movement : MonoBehaviour
         {
             float wallAngleX = Mathf.Cos(Mathf.Asin(wallAngle.y)*2f);
             float wallAngleZ = Mathf.Sin(Mathf.Asin(wallAngle.y)*2f);
-            
             movementSpeed = wallSpeed;
-            rb.velocity = new Vector3(wallAngleZ*movementSpeed/120, 0, wallAngleX*movementSpeed/120);
             if(Input.GetKey("space")){
                 rb.velocity = new Vector3(rb.velocity.z, jumpForce, rb.velocity.x);
+            }else{
+                 rb.velocity = new Vector3(wallAngleZ*movementSpeed/120f, 0f, wallAngleX*movementSpeed/120f);
             }
             jumps = maxExtraJumps;
             Debug.Log(wallAngleX);
