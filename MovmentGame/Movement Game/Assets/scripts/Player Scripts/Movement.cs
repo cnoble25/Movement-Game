@@ -128,6 +128,7 @@ public class Movement : MonoBehaviour
         float verticalInput = Input.GetAxis("Vertical");
 
         Vector3 forward = Camera.main.transform.forward;
+        Debug.Log(Mathf.Asin(forward.x));
         Vector3 right = Camera.main.transform.right;
         forward.y = 0;
         right.y = 0;
