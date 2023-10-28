@@ -22,7 +22,10 @@ public class Movement : MonoBehaviour
     bool wallRunning = false;
     bool sprinting = false;
     bool sprintKeyDown = false;
+    bool hasWallJumped = false;
     int jumps;
+    Vector3 forward;
+    bool hasAWall = false;
 
     // Start is called before the first frame update
     void Start()
@@ -34,7 +37,7 @@ public class Movement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        forward = Camera.main.transform.forward;
         float horizontalInput = Input.GetAxis("Horizontal");
         float verticalInput = Input.GetAxis("Vertical");
         // rb.velocity = new Vector3(horizontalInput * movementSpeed, rb.velocity.y, verticalInput * movementSpeed);
@@ -42,6 +45,7 @@ public class Movement : MonoBehaviour
         if (isGrounded())
         {
             jumps = maxExtraJumps;
+            hasWallJumped = false;
         }
         //---------------------------------------------------------------------------
         if (Input.GetButtonDown("Jump") &&  jumps > 0)
@@ -92,22 +96,46 @@ public class Movement : MonoBehaviour
 
         if (touchingWall())
         {
-            float wallAngleX = Mathf.Cos(Mathf.Asin(wallAngle.y)*2f);
-            float wallAngleZ = Mathf.Sin(Mathf.Asin(wallAngle.y)*2f);
-            movementSpeed = wallSpeed;
-            if(Input.GetKey("space")){
-                rb.velocity = new Vector3(rb.velocity.z, jumpForce, rb.velocity.x);
-            }else{
-                 rb.velocity = new Vector3(wallAngleZ*movementSpeed/120f, 0f, wallAngleX*movementSpeed/120f);
-            }
-            jumps = maxExtraJumps;
-            Debug.Log(wallAngleX);
             
+            float wallAngleX = Mathf.Cos(Mathf.Asin(wallAngle.y) * 2f);
+            float wallAngleZ = Mathf.Sin(Mathf.Asin(wallAngle.y) * 2f);
+            float angleShit = Mathf.Asin(wallAngle.y) * 2f;
+            movementSpeed = wallSpeed;
+            if(Input.GetKey("space") && !hasWallJumped){
+                rb.velocity = new Vector3(rb.velocity.z, jumpForce, rb.velocity.x);
+                hasWallJumped = true;
+                jumps = maxExtraJumps;
+            }
+            else if(!hasWallJumped && hasAWall){
+                if ((Input.GetKey(KeyCode.W) && Mathf.Asin(forward.z) > angleShit) || (Input.GetKey(KeyCode.S) && Mathf.Asin(forward.z) < angleShit))
+                {
+                    rb.velocity = new Vector3(wallAngleZ * movementSpeed / 120f, 0f, wallAngleX * movementSpeed / 120f);
+                }
+                else
+                if ((Input.GetKey(KeyCode.S) && Mathf.Asin(forward.z) >= angleShit) || (Input.GetKey(KeyCode.W) && Mathf.Asin(forward.z) <= angleShit) && !isGrounded())
+                {
+                    rb.velocity = new Vector3(-1f*wallAngleZ * movementSpeed / 120f, 0f, -1f*wallAngleX * movementSpeed / 120f);
+                }
+                else if(!isGrounded()) 
+                {
+
+                    rb.velocity = new Vector3(0f, 0f, 0f);
+                }
+            }
+
+            
+            Debug.Log(Mathf.Asin(wallAngle.y)*2f*180f/Mathf.PI);
+
+
+        }
+        else
+        {
+            hasWallJumped = false;
         }
         //---------------------------------------------------------------------------
-       
-       
-        
+
+
+
     }
 
     bool touchingWall()
@@ -127,8 +155,9 @@ public class Movement : MonoBehaviour
         float horizontalInput = Input.GetAxis("Horizontal");
         float verticalInput = Input.GetAxis("Vertical");
 
-        Vector3 forward = Camera.main.transform.forward;
-        Debug.Log(Mathf.Asin(forward.x));
+       
+        //Debug.Log(Mathf.Asin(forward.x)*180f/Math.PI);
+        //Debug.Log(Mathf.Asin(forward.z) * 180f / Math.PI);
         Vector3 right = Camera.main.transform.right;
         forward.y = 0;
         right.y = 0;
@@ -157,6 +186,7 @@ public class Movement : MonoBehaviour
 
         if(collision.gameObject.CompareTag("Wall")){
             wallAngle = collision.transform.rotation;
+            hasAWall = true;
         }
 
         
@@ -164,6 +194,9 @@ public class Movement : MonoBehaviour
 
     void OnCollisionExit(Collision collision)
     {
-
+        if (collision.gameObject.CompareTag("Wall"))
+        {
+            hasAWall = false;
+        }
     }
 }
