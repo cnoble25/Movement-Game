@@ -12,7 +12,7 @@ public class PlayerLife : MonoBehaviour
             Die();
         }
     }
-
+// 
     void Die()
     {
         GetComponent<MeshRenderer>().enabled = false;

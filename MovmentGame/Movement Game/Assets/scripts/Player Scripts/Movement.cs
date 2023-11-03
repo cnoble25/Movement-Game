@@ -25,6 +25,10 @@ public class Movement : MonoBehaviour
     bool hasWallJumped = false;
     int jumps;
     Vector3 forward;
+    Vector3 right;
+    float xzAngle;
+    Quaternion cameraAngle;
+    Vector3 wallForward;
     bool hasAWall = false;
 
     // Start is called before the first frame update
@@ -38,6 +42,25 @@ public class Movement : MonoBehaviour
     void Update()
     {
         forward = Camera.main.transform.forward;
+        right = Camera.main.transform.right;
+        // float angleThing = Mathf.Atan(right.x/forward.x)*180f/Mathf.PI
+        if(!(forward.x < 0) && !(forward.z < 0)){
+           xzAngle = Mathf.Atan(forward.z/forward.x);
+        }else if(!(forward.x < 0) && !(forward.z > 0)){
+             xzAngle = Mathf.Atan(forward.z/forward.x) + Mathf.PI*2f;
+        }
+        else{
+            xzAngle = Mathf.Atan(forward.z/forward.x) + Mathf.PI;
+        }
+
+        // Debug.Log(xzAngle*180/Mathf.PI);
+
+        // Debug.Log(wallForward);
+        // Debug.Log(forward.x);
+        
+        // Debug.Log(Mathf.Atan(forward.x/forward.z)*180f/Mathf.PI);
+        //Debug.Log(cameraAngle.y);
+        // Debug.Log((Mathf.Asin(forward.x)*2f + Mathf.PI/2f)*180f/Mathf.PI);
         float horizontalInput = Input.GetAxis("Horizontal");
         float verticalInput = Input.GetAxis("Vertical");
         // rb.velocity = new Vector3(horizontalInput * movementSpeed, rb.velocity.y, verticalInput * movementSpeed);
@@ -124,8 +147,7 @@ public class Movement : MonoBehaviour
             }
 
             
-            Debug.Log(Mathf.Asin(wallAngle.y)*2f*180f/Mathf.PI);
-
+            Debug.Log(wallAngle.y);
 
         }
         else
@@ -158,7 +180,8 @@ public class Movement : MonoBehaviour
        
         //Debug.Log(Mathf.Asin(forward.x)*180f/Math.PI);
         //Debug.Log(Mathf.Asin(forward.z) * 180f / Math.PI);
-        Vector3 right = Camera.main.transform.right;
+        
+
         forward.y = 0;
         right.y = 0;
         forward = forward.normalized;
@@ -187,6 +210,7 @@ public class Movement : MonoBehaviour
         if(collision.gameObject.CompareTag("Wall")){
             wallAngle = collision.transform.rotation;
             hasAWall = true;
+            wallForward = collision.transform.forward;
         }
 
         
