@@ -147,7 +147,7 @@ public class Movement : MonoBehaviour
             }
 
             
-            Debug.Log(wallAngle.y);
+            Debug.Log(Mathf.Abs(angleShit)*90/Mathf.PI);
 
         }
         else
