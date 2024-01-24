@@ -17,9 +17,9 @@ public class Movement : MonoBehaviour
     [SerializeField] float wallSpeed = 1500f;
     [SerializeField] float sprintSpeed = 1000f;
     Quaternion wallAngle;
+
     
 
-    bool wallRunning = false;
     bool sprinting = false;
     bool sprintKeyDown = false;
     bool hasWallJumped = false;
@@ -27,8 +27,9 @@ public class Movement : MonoBehaviour
     Vector3 forward;
     Vector3 right;
     float xzAngle;
-    Quaternion cameraAngle;
     Vector3 wallForward;
+
+    Vector3 wallRight;
     bool hasAWall = false;
 
     // Start is called before the first frame update
@@ -54,7 +55,6 @@ public class Movement : MonoBehaviour
 
         // Debug.Log(xzAngle*180/Mathf.PI);
 
-        // Debug.Log(wallForward);
         // Debug.Log(forward.x);
         
         // Debug.Log(Mathf.Atan(forward.x/forward.z)*180f/Mathf.PI);
@@ -119,9 +119,24 @@ public class Movement : MonoBehaviour
         if (touchingWall())
         {
             
-            float wallAngleX = Mathf.Cos(Mathf.Asin(wallAngle.y) * 2f);
-            float wallAngleZ = Mathf.Sin(Mathf.Asin(wallAngle.y) * 2f);
-            float angleShit = Mathf.Asin(wallAngle.y) * 2f;
+            bool withWall;
+            double testAngle = 0.0;
+            if(!(wallForward.x < 0) && !(wallForward.z < 0)){
+                testAngle = Mathf.Atan(wallForward.z/wallForward.x);
+            }else if(!(forward.x < 0) && !(forward.z > 0)){
+                testAngle = Mathf.Atan(wallForward.z/wallForward.x) + Mathf.PI*2f;
+            } else{
+               testAngle = Mathf.Atan(wallForward.z/wallForward.x) + Mathf.PI;
+            }
+
+            if(Mathf.Abs((float)testAngle - (float)xzAngle) < Mathf.PI/2 ){
+                withWall = true;
+            }else{
+                withWall = false;
+            }
+
+            // Debug.Log(testAngle*180/Mathf.PI);
+            // Debug.Log(Mathf.Asin(testAngle)*(180/Mathf.PI)*2);
             movementSpeed = wallSpeed;
             if(Input.GetKey("space") && !hasWallJumped){
                 rb.velocity = new Vector3(rb.velocity.z, jumpForce, rb.velocity.x);
@@ -129,14 +144,14 @@ public class Movement : MonoBehaviour
                 jumps = maxExtraJumps;
             }
             else if(!hasWallJumped && hasAWall){
-                if ((Input.GetKey(KeyCode.W) && Mathf.Asin(forward.z) > angleShit) || (Input.GetKey(KeyCode.S) && Mathf.Asin(forward.z) < angleShit))
+                if ((Input.GetKey(KeyCode.W) && withWall) || (Input.GetKey(KeyCode.S) && !withWall) && !isGrounded())
                 {
-                    rb.velocity = new Vector3(wallAngleZ * movementSpeed / 120f, 0f, wallAngleX * movementSpeed / 120f);
+                    rb.velocity = new Vector3(Mathf.Cos((float)testAngle) * movementSpeed / 120f, 0f, Mathf.Sin((float)testAngle) * movementSpeed / 120f);
                 }
                 else
-                if ((Input.GetKey(KeyCode.S) && Mathf.Asin(forward.z) >= angleShit) || (Input.GetKey(KeyCode.W) && Mathf.Asin(forward.z) <= angleShit) && !isGrounded())
+                if ((Input.GetKey(KeyCode.S) && withWall) || (Input.GetKey(KeyCode.W) && !withWall) && !isGrounded())
                 {
-                    rb.velocity = new Vector3(-1f*wallAngleZ * movementSpeed / 120f, 0f, -1f*wallAngleX * movementSpeed / 120f);
+                    rb.velocity = new Vector3(-1f* Mathf.Cos((float)testAngle) * movementSpeed / 120f, 0f, -1f* Mathf.Sin((float)testAngle) * movementSpeed / 120f);
                 }
                 else if(!isGrounded()) 
                 {
@@ -146,7 +161,7 @@ public class Movement : MonoBehaviour
             }
 
             
-            Debug.Log(Mathf.Abs(angleShit)*90/Mathf.PI);
+            // Debug.Log(Mathf.Abs(angleShit)*90/Mathf.PI);
 
         }
         else
