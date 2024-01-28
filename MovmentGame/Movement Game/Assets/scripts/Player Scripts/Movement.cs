@@ -128,14 +128,16 @@ public class Movement : MonoBehaviour
             } else{
                testAngle = Mathf.Atan(wallForward.z/wallForward.x) + Mathf.PI;
             }
+            
 
-            if(Mathf.Abs((float)testAngle - (float)xzAngle) < Mathf.PI/2 ){
+            if (Mathf.Abs((float)testAngle - (float)xzAngle) < Mathf.PI / 2 || Mathf.Abs(((float)testAngle + Mathf.PI * 2) - (float)xzAngle) < Mathf.PI / 2)
+            {
                 withWall = true;
             }else{
                 withWall = false;
             }
-
-            // Debug.Log(testAngle*180/Mathf.PI);
+            //Debug.Log(xzAngle * 180 / Mathf.PI);
+            //Debug.Log(testAngle*180/Mathf.PI);
             // Debug.Log(Mathf.Asin(testAngle)*(180/Mathf.PI)*2);
             movementSpeed = wallSpeed;
             if(Input.GetKey("space") && !hasWallJumped){
