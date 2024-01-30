@@ -8,6 +8,7 @@ TagManager:
   - Undefined
   - Enemy Head
   - Wall
+  - Purple ORB
   layers:
   - Default
   - TransparentFX
@@ -17,7 +18,7 @@ TagManager:
   - UI
   - Ground
   - Wall
-  - 
+  - Camera
   - 
   - 
   - 
